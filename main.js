@@ -3,16 +3,12 @@ const crypto = require('crypto');
 const config = require('./lib/configuration');
 
 const symbols = ['BTC', 'ETH', 'ETC', 'XMR', 'USD'];
-
 const apiKey = config.get('bitfinex:key');
 const apiSecret = config.get('bitfinex:secret');
-const url = 'v2/auth/r/wallets';
-
-let nonce = Date.now().toString();
 const body = {};
 const rawBody = JSON.stringify(body);
 
-function signMessage() {
+function signMessage(url, nonce) {
     let signature = `/api/${url}${nonce}${rawBody}`;
     signature = crypto.createHmac('sha384', apiSecret)
         .update(signature)
@@ -22,7 +18,9 @@ function signMessage() {
 }
 
 function getBitfinexWallets() {
-    let signature = signMessage();
+    let url = 'v2/auth/r/wallets';
+    let nonce = Date.now().toString();
+    let signature = signMessage(url, nonce);
     let options = {
         url: `https://api.bitfinex.com/${url}`,
         headers: {
@@ -60,4 +58,24 @@ function getBitfinexWallets() {
     });
 }
 
+function getBitfinexPositions() {
+    let url = 'v2/auth/r/positions';
+    let nonce = Date.now().toString();
+    let signature = signMessage(url, nonce);
+    let options = {
+        url: `https://api.bitfinex.com/${url}`,
+        headers: {
+            'bfx-nonce': nonce,
+            'bfx-apikey': apiKey,
+            'bfx-signature': signature
+        },
+        json: body
+    };
+
+    request.post(options, function (error, response, body) {
+        console.log(body);
+    });
+}
+
 getBitfinexWallets();
+getBitfinexPositions();
