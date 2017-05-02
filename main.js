@@ -5,16 +5,6 @@ const config = require('./lib/configuration');
 const body = {};
 const rawBody = JSON.stringify(body);
 
-function signMessage(url, nonce, hmac, apiSecret) {
-    let signature = `/api/${url}${nonce}${rawBody}`;
-    signature = crypto
-        .createHmac(hmac, apiSecret)
-        .update(signature)
-        .digest('hex');
-
-    return signature;
-}
-
 // Constructor
 function Bitfinex() {
     this.apiKey = config.get('bitfinex:key');
@@ -92,5 +82,23 @@ Bitfinex.prototype.getPositions = function(callback) {
         callback('$' + body[1][0]);
     });
 };
+
+/**
+ * Exchange specific message signing.
+ * @param url
+ * @param nonce
+ * @param hmac
+ * @param apiSecret
+ * @return {string}
+ */
+function signMessage(url, nonce, hmac, apiSecret) {
+    let signature = `/api/${url}${nonce}${rawBody}`;
+    signature = crypto
+        .createHmac(hmac, apiSecret)
+        .update(signature)
+        .digest('hex');
+
+    return signature;
+}
 
 module.exports = new Bitfinex();

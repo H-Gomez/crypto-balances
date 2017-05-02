@@ -48,7 +48,7 @@ function authorize(credentials, callback, dataset) {
  * Get and store new token after prompting for user authorization, and then
  * execute the given callback with the authorized OAuth2 client.
  * @param {google.auth.OAuth2} oauth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback to call with the authorized
+ * @param {function} callback The callback to call with the authorized
  * client.
  */
 function getNewToken(oauth2Client, callback) {
@@ -91,24 +91,38 @@ function storeToken(token) {
     console.log('Token stored to ' + TOKEN_PATH);
 }
 
-function updateSheets(auth, valueToPost) {
+/**
+ * Update the spreadsheet with the given payload. Requires the spreadsheet ID to be passed in.
+ * @param {object} auth
+ * @param {object} payload
+ */
+function updateSheets(auth, payload) {
     let sheets = google.sheets('v4');
+    let dataset = [];
 
-    sheets.spreadsheets.values.update({
-        auth: auth,
+    // Build payload object
+    for (let index in payload.Wallets) {
+        let dataToPush = {};
+        dataToPush.range = payload.Cells[index];
+        dataToPush.majorDimension = 'ROWS';
+        dataToPush.values = [[payload.Wallets[index]]];
+        dataset.push(dataToPush);
+    }
+
+    let request = {
         spreadsheetId: '1-MoC2Ph6Hi7DLFvsKJ-jXPlwWktWsqmL0Rv8qsUTESo',
-        range: 'BTC Trades!C10',
-        valueInputOption: 'USER_ENTERED',
         resource: {
-            range: 'BTC Trades!C10',
-            majorDimension: 'ROWS',
-            values: [[valueToPost]]
-        }
-    }, function(error, response) {
+            valueInputOption: 'USER_ENTERED',
+            data: dataset,
+        },
+        auth: auth
+    };
+
+    sheets.spreadsheets.values.batchUpdate(request, function(error, response) {
         if (error) {
             console.log("There was an error updating the sheet " + error);
         } else {
-            console.log("update successful " + response);
+            console.log("Updated spreadsheet successfully");
         }
     });
 }
