@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "crypto": "0.0.3",
+    "google-auth-library": "^0.10.0",
+    "googleapis": "^19.0.0",
     "nconf": "^0.8.4",
     "request": "^2.81.0"
   }

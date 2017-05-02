@@ -1,40 +1,50 @@
 const request = require('request');
 const crypto = require('crypto');
+const sign = require('./lib/signMessage');
 const config = require('./lib/configuration');
-
-const symbols = ['BTC', 'ETH', 'ETC', 'XMR', 'USD'];
-const apiKey = config.get('bitfinex:key');
-const apiSecret = config.get('bitfinex:secret');
 const body = {};
 const rawBody = JSON.stringify(body);
 
-function signMessage(url, nonce) {
+function signMessage(url, nonce, hmac, apiSecret) {
     let signature = `/api/${url}${nonce}${rawBody}`;
-    signature = crypto.createHmac('sha384', apiSecret)
+    signature = crypto
+        .createHmac(hmac, apiSecret)
         .update(signature)
         .digest('hex');
 
     return signature;
 }
 
-function getBitfinexWallets() {
+// Constructor
+function Bitfinex() {
+    this.apiKey = config.get('bitfinex:key');
+    this.apiSecret = config.get('bitfinex:secret');
+    this.baseUrl = config.get('bitfinex:url');
+    this.hmac = config.get('bitfinex:hmac');
+}
+
+/**
+ * Get the value of each available wallet and use as a parameter for the passed
+ * in callback function.
+ * @param {function} callback
+ * @return {object} wallets
+ */
+Bitfinex.prototype.getWallets = function(callback) {
     let url = 'v2/auth/r/wallets';
     let nonce = Date.now().toString();
-    let signature = signMessage(url, nonce);
+    let signature = signMessage(url, nonce, this.hmac, this.apiSecret);
     let options = {
-        url: `https://api.bitfinex.com/${url}`,
+        url: `${this.baseUrl}${url}`,
         headers: {
             'bfx-nonce': nonce,
-            'bfx-apikey': apiKey,
+            'bfx-apikey': this.apiKey,
             'bfx-signature': signature
         },
         json: body
     };
 
     request.post(options, function (error, response, body) {
-        let balances = {
-            BTC: 0, ETH: 0, ETC: 0, XMR: 0, USD: 0
-        };
+        let balances = { BTC: 0, ETH: 0, ETC: 0, XMR: 0, USD: 0 };
 
         body.forEach(function(item) {
             if (item[1] === 'BTC') {
@@ -54,28 +64,33 @@ function getBitfinexWallets() {
             }
         });
 
-        console.log(balances);
+        callback(balances);
     });
-}
+};
 
-function getBitfinexPositions() {
-    let url = 'v2/auth/r/positions';
+/**
+ * Get the value of all positions on in USD and use as the parameter for the passed
+ * in callback function.
+ * @param {function} callback
+ * @return {string} positionValue
+ */
+Bitfinex.prototype.getPositions = function(callback) {
+    let url = 'v2/auth/r/margin/base';
     let nonce = Date.now().toString();
-    let signature = signMessage(url, nonce);
+    let signature = signMessage(url, nonce, this.hmac, this.apiSecret);
     let options = {
-        url: `https://api.bitfinex.com/${url}`,
+        url: `${this.baseUrl}${url}`,
         headers: {
             'bfx-nonce': nonce,
-            'bfx-apikey': apiKey,
+            'bfx-apikey': this.apiKey,
             'bfx-signature': signature
         },
         json: body
     };
 
     request.post(options, function (error, response, body) {
-        console.log(body);
+        callback('$' + body[1][0]);
     });
-}
+};
 
-getBitfinexWallets();
-getBitfinexPositions();
+module.exports = new Bitfinex();
