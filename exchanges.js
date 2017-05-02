@@ -1,4 +1,4 @@
-const Bitfinex = require('./main.js');
+const Bitfinex = require('./api/bitfinex.js');
 const Google = require('./api/google.js');
 const fs = require('fs');
 

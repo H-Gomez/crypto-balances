@@ -2,11 +2,13 @@ const fs = require('fs');
 const readline = require('readline');
 const google = require('googleapis');
 const googleAuth = require('google-auth-library');
+const config = require('../lib/configuration');
 
 // Google sheets required variables.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly', 'https://www.googleapis.com/auth/spreadsheets'];
 const TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE) + '/.credentials/';
 const TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
+const spreadsheetId = config.get('google:spreadsheetID');
 
 function PostToSheet(data) {
     // Load client secrets from a local file.
@@ -110,7 +112,7 @@ function updateSheets(auth, payload) {
     }
 
     let request = {
-        spreadsheetId: '1-MoC2Ph6Hi7DLFvsKJ-jXPlwWktWsqmL0Rv8qsUTESo',
+        spreadsheetId: spreadsheetId,
         resource: {
             valueInputOption: 'USER_ENTERED',
             data: dataset,

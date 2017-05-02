@@ -1,6 +1,6 @@
 const request = require('request');
 const crypto = require('crypto');
-const config = require('./lib/configuration');
+const config = require('../lib/configuration');
 
 const apiKey = config.get('poloniex:key');
 const apiSecret = config.get('poloniex:secret');

@@ -1,7 +1,7 @@
 const request = require('request');
 const crypto = require('crypto');
-const sign = require('./lib/signMessage');
-const config = require('./lib/configuration');
+const sign = require('../lib/signMessage');
+const config = require('../lib/configuration');
 const body = {};
 const rawBody = JSON.stringify(body);
 
