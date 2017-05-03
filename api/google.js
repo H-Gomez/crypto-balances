@@ -103,11 +103,11 @@ function updateSheets(auth, payload) {
     let dataset = [];
 
     // Build payload object
-    for (let index in payload.Wallets) {
+    for (let index in payload['Wallets']) {
         let dataToPush = {};
-        dataToPush.range = payload.Cells[index];
+        dataToPush.range = payload['Cells'][index];
         dataToPush.majorDimension = 'ROWS';
-        dataToPush.values = [[payload.Wallets[index]]];
+        dataToPush.values = [[payload['Wallets'][index]]];
         dataset.push(dataToPush);
     }
 
