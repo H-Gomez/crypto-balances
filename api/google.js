@@ -129,6 +129,27 @@ function updateSheets(auth, payload) {
     });
 }
 
+function updateSheetSingle(auth, payload) {
+    let sheets = google.sheets('v4');
+    let dataset = [];
+    let request = {
+        spreadsheetId: spreadsheetId,
+        resource: {
+            valueInputOption: 'USER_ENTERED',
+            data: dataset,
+        },
+        auth: auth
+    };
+
+    sheets.spreadsheets.values.update(request, function(error, response) {
+       if (error) {
+           console.log("There was an error doing an single update");
+       } else {
+           console.log("Updated spreadsheet with single payload");
+       }
+    });
+}
+
 module.exports = {
     post: PostToSheet
 };
