@@ -38,6 +38,11 @@ Bitfinex.prototype.getWallets = function(callback) {
     request.post(options, function (error, response, body) {
         let balances = { BTC: 0, ETH: 0, ETC: 0, XMR: 0, USD: 0 };
 
+        if (error) {
+            console.log("There was an error with Bitfinex API: " + error);
+            return;
+        }
+
         body.forEach(function(item) {
             if (item[1] === 'BTC') {
                 balances.BTC += item[2];

@@ -15,11 +15,11 @@ let runSheetUpdater = cron.job('0 * * * * *', function() {
         } else {
             let cellMap = JSON.parse(fileContents);
 
-            Bittrex.getWallets(function(response) {
-                console.log(response);
-            });
+            // Bittrex.getWallets(function(response) {
+            //     console.log(response);
+            // });
 
-             Bitfinex.getWallets(function(response) {
+            Bitfinex.getWallets(function(response) {
                 let exchangePayload = {
                     "Wallets": response,
                     "Cells": cellMap['Bitfinex']

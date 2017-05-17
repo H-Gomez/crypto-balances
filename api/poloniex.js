@@ -31,7 +31,12 @@ Poloniex.prototype.getBalances = function(callback) {
         }
     };
 
-    request(options, function(err, response, body) {
+    request(options, function(error, response, body) {
+        if (error) {
+            console.log("There was an error with Poloniex API: " + error);
+            return;
+        }
+
         let btcAmount = 0;
         for (let coin in body) {
             if (body[coin]['btcValue'] > 0) {

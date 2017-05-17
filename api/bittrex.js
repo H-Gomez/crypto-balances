@@ -43,4 +43,8 @@ Bittrex.prototype.getWallets = function(callback) {
 
 };
 
+Bittrex.prototype.getTicker = function(callback) {
+
+};
+
 module.exports = new Bittrex();

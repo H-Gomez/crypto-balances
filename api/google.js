@@ -143,7 +143,7 @@ function updateSheetSingle(auth, payload) {
 
     sheets.spreadsheets.values.update(request, function(error, response) {
        if (error) {
-           console.log("There was an error doing an single update");
+           console.log("There was an error doing an single update: " + error);
        } else {
            console.log("Updated spreadsheet with single payload");
        }
