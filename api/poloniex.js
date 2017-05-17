@@ -3,7 +3,6 @@ const crypto = require('crypto');
 const config = require('../lib/configuration');
 
 let baseUrl = config.get('poloniex:url');
-let nonce = Date.now().toString();
 let tradingUrl = 'command=returnCompleteBalances&nonce=';
 
 // Constructor
@@ -15,6 +14,7 @@ function Poloniex() {
 }
 
 Poloniex.prototype.getBalances = function(callback) {
+    let nonce = Date.now().toString();
     let options = {
         method: 'POST',
         url: baseUrl,
