@@ -1,5 +1,6 @@
 const Bitfinex = require('./api/bitfinex.js');
 const Poloniex = require('./api/poloniex.js');
+const Bittrex = require('./api/bittrex.js');
 const Google = require('./api/google.js');
 const fs = require('fs');
 
@@ -9,23 +10,27 @@ fs.readFile('./config/cellMap.json', function(error, fileContents) {
    } else {
         let cellMap = JSON.parse(fileContents);
 
-        Bitfinex.getWallets(function(response) {
-           let exchangePayload = {
-               "Wallets": response,
-               "Cells": cellMap['Bitfinex']
-           };
+        Bittrex.getWallets(function(response) {
+            console.log(response);
+        });
 
-           Google.post(exchangePayload);
-       });
-
-       Poloniex.getBalances(function(response) {
-           let exchangePayload = {
-               "Wallets": { BTC: response },
-               "Cells": cellMap['Poloniex']
-           };
-
-           Google.post(exchangePayload);
-       });
+       //  Bitfinex.getWallets(function(response) {
+       //     let exchangePayload = {
+       //         "Wallets": response,
+       //         "Cells": cellMap['Bitfinex']
+       //     };
+       //
+       //     Google.post(exchangePayload);
+       // });
+       //
+       // Poloniex.getBalances(function(response) {
+       //     let exchangePayload = {
+       //         "Wallets": { BTC: response },
+       //         "Cells": cellMap['Poloniex']
+       //     };
+       //
+       //     Google.post(exchangePayload);
+       // });
    }
 });
 
