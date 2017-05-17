@@ -1,6 +1,7 @@
 const request = require('request');
 const crypto = require('crypto');
 const config = require('../lib/configuration');
+const sign = require('../lib/signMessage');
 
 let baseUrl = config.get('poloniex:url');
 let tradingUrl = 'command=returnCompleteBalances&nonce=';
@@ -15,6 +16,7 @@ function Poloniex() {
 
 Poloniex.prototype.getBalances = function(callback) {
     let nonce = Date.now().toString();
+    let signature = `${tradingUrl}${nonce}`;
     let options = {
         method: 'POST',
         url: baseUrl,
@@ -25,7 +27,7 @@ Poloniex.prototype.getBalances = function(callback) {
         },
         headers: {
             Key: this.apiKey,
-            Sign: signMessage(tradingUrl, nonce, 'sha512', this.apiSecret),
+            Sign: sign.signMessage(signature, 'sha512', this.apiSecret),
         }
     };
 
@@ -40,15 +42,5 @@ Poloniex.prototype.getBalances = function(callback) {
         callback(btcAmount.toFixed(8));
     });
 };
-
-function signMessage(url, nonce, hmac, apiSecret) {
-    let signature = `${url}${nonce}`;
-    signature = crypto
-        .createHmac(hmac, apiSecret)
-        .update(signature)
-        .digest('hex');
-
-    return signature;
-}
 
 module.exports = new Poloniex();

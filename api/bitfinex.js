@@ -1,7 +1,8 @@
 const request = require('request');
 const crypto = require('crypto');
-const sign = require('../lib/signMessage');
 const config = require('../lib/configuration');
+const sign = require('../lib/signMessage');
+
 const body = {};
 const rawBody = JSON.stringify(body);
 
@@ -22,13 +23,14 @@ function Bitfinex() {
 Bitfinex.prototype.getWallets = function(callback) {
     let url = 'v2/auth/r/wallets';
     let nonce = Date.now().toString();
-    let signature = signMessage(url, nonce, this.hmac, this.apiSecret);
+    let signature = `/api/${url}${nonce}${rawBody}`;
+    let signedMessage = sign.signMessage(signature, this.hmac, this.apiSecret);
     let options = {
         url: `${this.baseUrl}${url}`,
         headers: {
             'bfx-nonce': nonce,
             'bfx-apikey': this.apiKey,
-            'bfx-signature': signature
+            'bfx-signature': signedMessage
         },
         json: body
     };
@@ -67,13 +69,14 @@ Bitfinex.prototype.getWallets = function(callback) {
 Bitfinex.prototype.getPositions = function(callback) {
     let url = 'v2/auth/r/margin/base';
     let nonce = Date.now().toString();
-    let signature = signMessage(url, nonce, this.hmac, this.apiSecret);
+    let signature = `/api/${url}${nonce}${rawBody}`;
+    let signedMessage = sign.signMessage(signature, this.hmac, this.apiSecret);
     let options = {
         url: `${this.baseUrl}${url}`,
         headers: {
             'bfx-nonce': nonce,
             'bfx-apikey': this.apiKey,
-            'bfx-signature': signature
+            'bfx-signature': signedMessage
         },
         json: body
     };
@@ -82,23 +85,5 @@ Bitfinex.prototype.getPositions = function(callback) {
         callback('$' + body[1][0]);
     });
 };
-
-/**
- * Exchange specific message signing.
- * @param url
- * @param nonce
- * @param hmac
- * @param apiSecret
- * @return {string}
- */
-function signMessage(url, nonce, hmac, apiSecret) {
-    let signature = `/api/${url}${nonce}${rawBody}`;
-    signature = crypto
-        .createHmac(hmac, apiSecret)
-        .update(signature)
-        .digest('hex');
-
-    return signature;
-}
 
 module.exports = new Bitfinex();

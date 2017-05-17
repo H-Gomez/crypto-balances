@@ -8,23 +8,22 @@ const Google = require('./api/google.js');
 const fs = require('fs');
 const cron  = require('cron');
 
-let runSheetUpdater = cron.job('2 * * * * *', function() {
+let runSheetUpdater = cron.job('0 * * * * *', function() {
     fs.readFile('./config/cellMap.json', function(error, fileContents) {
         if (error) {
             console.log("Unable to read cell map " + error);
         } else {
             let cellMap = JSON.parse(fileContents);
 
-            // Bittrex.getWallets(function(response) {
-            //     console.log(response);
-            // });
+            Bittrex.getWallets(function(response) {
+                console.log(response);
+            });
 
              Bitfinex.getWallets(function(response) {
                 let exchangePayload = {
                     "Wallets": response,
                     "Cells": cellMap['Bitfinex']
                 };
-                console.log(exchangePayload);
                 Google.post(exchangePayload);
             });
 
@@ -33,7 +32,6 @@ let runSheetUpdater = cron.job('2 * * * * *', function() {
                     "Wallets": { BTC: response },
                     "Cells": cellMap['Poloniex']
                 };
-                console.log(exchangePayload);
                 Google.post(exchangePayload);
             });
         }

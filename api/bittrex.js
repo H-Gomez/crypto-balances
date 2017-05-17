@@ -1,6 +1,7 @@
 const request = require('request');
 const crypto = require('crypto');
 const config = require('../lib/configuration');
+const sign = require('../lib/signMessage');
 let nonce = Date.now().toString();
 
 // Constructor
@@ -25,7 +26,7 @@ Bittrex.prototype.getWallets = function(callback) {
         json: true,
         headers: {
             Key: this.apiKey,
-            apisign: signMessage(uri, 'sha512', this.apiSecret),
+            apisign: sign.signMessage(uri, 'sha512', this.apiSecret),
         }
     };
 
@@ -41,15 +42,5 @@ Bittrex.prototype.getWallets = function(callback) {
     });
 
 };
-
-function signMessage(url, hmac, apiSecret) {
-    let signature = `${url}`;
-    signature = crypto
-        .createHmac(hmac, apiSecret)
-        .update(signature)
-        .digest('hex');
-
-    return signature;
-}
 
 module.exports = new Bittrex();
