@@ -8,16 +8,35 @@ const Google = require('./api/google.js');
 const fs = require('fs');
 const cron  = require('cron');
 
-let runSheetUpdater = cron.job('0 * * * * *', function() {
+let runSheetUpdater = cron.job('2 * * * * *', function() {
     fs.readFile('./config/cellMap.json', function(error, fileContents) {
         if (error) {
             console.log("Unable to read cell map " + error);
         } else {
             let cellMap = JSON.parse(fileContents);
 
-            // Bittrex.getWallets(function(response) {
-            //     console.log(response);
-            // });
+            Bittrex.getWallets(function(tickers) {
+                // Calculate BTC value for each balance
+                let btcValue = 0;
+                let itemsProcessed = 0;
+
+                tickers.forEach(function(item) {
+                    // If current ticker is Bitcoin
+                    if (item['Currency'] === 'BTC') {
+                        btcValue += item['Balance'];
+                        return;
+                    }
+
+                    Bittrex.getTicker(item['Currency'], function(response) {
+                        btcValue += item['Balance'] * response;
+                        itemsProcessed++;
+
+                        if (itemsProcessed === (tickers.length - 1)) {
+                            Google.postToSingle(btcValue);
+                        }
+                    });
+                });
+            });
 
             Bitfinex.getWallets(function(response) {
                 let exchangePayload = {
@@ -41,6 +60,9 @@ let runSheetUpdater = cron.job('0 * * * * *', function() {
 });
 
 runSheetUpdater.start();
+
+
+
 
 
 

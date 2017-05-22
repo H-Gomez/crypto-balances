@@ -30,21 +30,50 @@ Bittrex.prototype.getWallets = function(callback) {
         }
     };
 
-    request(options, function(err, response, body) {
-        let btcAmount = 0;
-        for (let coin in body) {
-            if (body[coin]['btcValue'] > 0) {
-                btcAmount += parseFloat(body[coin]['btcValue']);
-            }
+    request(options, function(error, response, body) {
+        if (error) {
+            console.log("There was an error with Bittrex API:" + error)
         }
 
-        console.log(response);
+        // Build result object for available balances.
+        let availableBalances = [];
+        body.result.forEach(function(coin) {
+            if (coin['Balance'] > 0) {
+                availableBalances.push(coin);
+            }
+        });
+
+        callback(availableBalances);
     });
 
 };
 
-Bittrex.prototype.getTicker = function(callback) {
+/**
+ * Public call to get ticker prices from API.
+ * @param ticker
+ * @param callback
+ */
+Bittrex.prototype.getTicker = function(ticker, callback) {
+    let uri = `${this.baseUrl}/public/getticker?market=BTC-${ticker}`;
+    let options = {
+        method: 'GET',
+        url: uri,
+        json: true
+    };
 
+    request(options, function(error, response, body) {
+        if (error) {
+            console.log("There was an error getting the tickers for Bittrex: " + error);
+            return;
+        }
+
+        if (body.result ===  null) {
+            console.log("Response body was null");
+            return;
+        }
+
+        callback(body.result['Last']);
+    });
 };
 
 module.exports = new Bittrex();

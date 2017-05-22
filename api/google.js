@@ -10,17 +10,7 @@ const TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH || process.env.USERP
 const TOKEN_PATH = TOKEN_DIR + 'sheets.googleapis.com-nodejs-quickstart.json';
 const spreadsheetId = config.get('google:spreadsheetID');
 
-function PostToSheet(data) {
-    // Load client secrets from a local file.
-    fs.readFile('./config/client_secret.json', function processClientSecrets(error, content) {
-        if (error) {
-            console.log('Error loading client secret file: ' + error);
-            return;
-        }
-        // Authorize a client with the loaded credentials, then call the Google Sheets API.
-        authorize(JSON.parse(content), updateSheets, data);
-    });
-}
+
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -94,6 +84,35 @@ function storeToken(token) {
 }
 
 /**
+ * Begins the authentication process to batch update spreadsheets.
+ * @param data
+ * @constructor
+ */
+function PostToSheet(data) {
+    // Load client secrets from a local file.
+    fs.readFile('./config/client_secret.json', function processClientSecrets(error, content) {
+        if (error) {
+            console.log('Error loading client secret file: ' + error);
+            return;
+        }
+        // Authorize a client with the loaded credentials, then call the Google Sheets API.
+        authorize(JSON.parse(content), updateSheets, data);
+    });
+}
+
+function PostToSheetSingle(data) {
+    // Load client secrets from a local file.
+    fs.readFile('./config/client_secret.json', function processClientSecrets(error, content) {
+        if (error) {
+            console.log('Error loading client secret file: ' + error);
+            return;
+        }
+        // Authorize a client with the loaded credentials, then call the Google Sheets API.
+        authorize(JSON.parse(content), updateSheetSingle, data);
+    });
+}
+
+/**
  * Update the spreadsheet with the given payload. Requires the spreadsheet ID to be passed in.
  * @param {object} auth
  * @param {object} payload
@@ -131,12 +150,14 @@ function updateSheets(auth, payload) {
 
 function updateSheetSingle(auth, payload) {
     let sheets = google.sheets('v4');
-    let dataset = [];
     let request = {
         spreadsheetId: spreadsheetId,
+        range: 'BTC Trades!E10',
+        valueInputOption: 'USER_ENTERED',
         resource: {
-            valueInputOption: 'USER_ENTERED',
-            data: dataset,
+            range: 'BTC Trades!E10',
+            majorDimension: 'ROWS',
+            values: [[payload]]
         },
         auth: auth
     };
@@ -151,5 +172,6 @@ function updateSheetSingle(auth, payload) {
 }
 
 module.exports = {
-    post: PostToSheet
+    post: PostToSheet,
+    postToSingle: PostToSheetSingle
 };
