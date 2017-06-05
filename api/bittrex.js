@@ -45,7 +45,6 @@ Bittrex.prototype.getWallets = function(callback) {
 
         callback(availableBalances);
     });
-
 };
 
 /**
@@ -72,7 +71,16 @@ Bittrex.prototype.getTicker = function(ticker, callback) {
             return;
         }
 
-        callback(body.result['Last']);
+        if ( body.result === undefined) {
+            console.log("Body result was undefined");
+            return;
+        }
+
+        console.log(body.result);
+
+        if(body.result['Last']) {
+            callback(body.result['Last']);
+        }
     });
 };
 

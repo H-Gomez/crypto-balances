@@ -8,7 +8,7 @@ const Google = require('./api/google.js');
 const fs = require('fs');
 const cron  = require('cron');
 
-let runSheetUpdater = cron.job('2 * * * * *', function() {
+let runSheetUpdater = cron.job('3 * * * * *', function() {
     fs.readFile('./config/cellMap.json', function(error, fileContents) {
         if (error) {
             console.log("Unable to read cell map " + error);
