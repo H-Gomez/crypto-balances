@@ -19,22 +19,30 @@ let runSheetUpdater = cron.job('3 * * * * *', function() {
                 // Calculate BTC value for each balance
                 let btcValue = 0;
                 let itemsProcessed = 0;
+                let balances = { BTC: 0, USD: 0 };
 
                 tickers.forEach(function(item) {
                     // If current ticker is Bitcoin
                     if (item['Currency'] === 'BTC') {
                         btcValue += item['Balance'];
                         return;
+                    } else if (item['Currency'] === 'USDT') {
+                        balances.USD = item['Balance'];
+                        return;
                     }
 
-                    Bittrex.getTicker(item['Currency'], function(response) {
-                        btcValue += item['Balance'] * response;
-                        itemsProcessed++;
+                    if (item['Currency'] !== 'USDT' || item['Currency'] !== 'BTC') {
+                        Bittrex.getTicker(item['Currency'], function(response) {
+                            btcValue += item['Balance'] * response;
+                            console.log('result for ticker: ' + item['Currency'] + ' BTC Value ' + btcValue);
+                            itemsProcessed++;
+                            console.log(itemsProcessed + 'items length: ' + tickers.length);
 
-                        if (itemsProcessed === (tickers.length - 1)) {
-                            Google.postToSingle(btcValue);
-                        }
-                    });
+                            if (itemsProcessed === (tickers.length - 2)) {
+                                Google.postToSingle(btcValue);
+                            }
+                        });
+                    }
                 });
             });
 

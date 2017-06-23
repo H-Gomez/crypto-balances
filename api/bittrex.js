@@ -32,7 +32,8 @@ Bittrex.prototype.getWallets = function(callback) {
 
     request(options, function(error, response, body) {
         if (error) {
-            console.log("There was an error with Bittrex API:" + error)
+            console.log("There was an error with Bittrex API:" + error);
+            return;
         }
 
         // Build result object for available balances.
@@ -42,7 +43,7 @@ Bittrex.prototype.getWallets = function(callback) {
                 availableBalances.push(coin);
             }
         });
-
+        console.log(availableBalances);
         callback(availableBalances);
     });
 };
@@ -59,7 +60,7 @@ Bittrex.prototype.getTicker = function(ticker, callback) {
         url: uri,
         json: true
     };
-
+    console.log("Get ticker for: " + ticker);
     request(options, function(error, response, body) {
         if (error) {
             console.log("There was an error getting the tickers for Bittrex: " + error);
@@ -75,9 +76,6 @@ Bittrex.prototype.getTicker = function(ticker, callback) {
             console.log("Body result was undefined");
             return;
         }
-
-        console.log(body.result);
-
         if(body.result['Last']) {
             callback(body.result['Last']);
         }
