@@ -16,14 +16,16 @@ function Poloniex() {
 
 Poloniex.prototype.getBalances = function(callback) {
     let nonce = Date.now().toString();
-    let signature = `${tradingUrl}${nonce}`;
+    let accountType = '&account=all';
+    let signature = `${tradingUrl}${nonce}${accountType}`;
     let options = {
         method: 'POST',
         url: baseUrl,
         json: true,
         form: {
             command: 'returnCompleteBalances',
-            nonce: nonce
+            nonce: nonce,
+            account: 'all'
         },
         headers: {
             Key: this.apiKey,
