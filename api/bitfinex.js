@@ -36,8 +36,6 @@ Bitfinex.prototype.getWallets = function(callback) {
     };
 
     request.post(options, function (error, response, body) {
-        console.log(body);
-
         let balances = { BTC: 0, ETH: 0, ETC: 0, LTC: 0, USD: 0 };
 
         if (error) {
@@ -62,7 +60,7 @@ Bitfinex.prototype.getWallets = function(callback) {
                 balances.USD += item[2];
             }
         });
-        console.log(balances);
+
         callback(balances);
     });
 };
