@@ -140,7 +140,7 @@ function updateSheets(auth, payload) {
         auth: auth
     };
 
-    sheets.spreadsheets.values.batchUpdate(request, function(error, response) {
+    sheets.spreadsheets.values.batchUpdate(request, function(error) {
         if (error) {
             console.log("There was an error updating the sheet " + error);
         } else {

@@ -36,7 +36,9 @@ Bitfinex.prototype.getWallets = function(callback) {
     };
 
     request.post(options, function (error, response, body) {
-        let balances = { BTC: 0, ETH: 0, ETC: 0, XMR: 0, USD: 0 };
+        console.log(body);
+
+        let balances = { BTC: 0, ETH: 0, ETC: 0, LTC: 0, USD: 0 };
 
         if (error) {
             console.log("There was an error with Bitfinex API: " + error);
@@ -53,14 +55,14 @@ Bitfinex.prototype.getWallets = function(callback) {
             if (item[1] === 'ETC') {
                 balances.ETC += item[2];
             }
-            if (item[1] === 'XMR') {
-                balances.XMR += item[2];
+            if (item[1] === 'LTC') {
+                balances.LTC += item[2];
             }
             if (item[1] === 'USD') {
                 balances.USD += item[2];
             }
         });
-
+        console.log(balances);
         callback(balances);
     });
 };

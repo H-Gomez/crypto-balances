@@ -8,7 +8,7 @@ const Google = require('./api/google.js');
 const fs = require('fs');
 const cron  = require('cron');
 
-let runSheetUpdater = cron.job('3 * * * * *', function() {
+let runSheetUpdater = cron.job('1 * * * * *', function() {
     fs.readFile('./config/cellMap.json', function(error, fileContents) {
         if (error) {
             console.log("Unable to read cell map " + error);
@@ -34,9 +34,8 @@ let runSheetUpdater = cron.job('3 * * * * *', function() {
                     if (item['Currency'] !== 'USDT' || item['Currency'] !== 'BTC') {
                         Bittrex.getTicker(item['Currency'], function(response) {
                             btcValue += item['Balance'] * response;
-                            console.log('result for ticker: ' + item['Currency'] + ' BTC Value ' + btcValue);
+                            //console.log('result for ticker: ' + item['Currency'] + ' BTC Value ' + btcValue);
                             itemsProcessed++;
-                            console.log(itemsProcessed + 'items length: ' + tickers.length);
 
                             if (itemsProcessed === (tickers.length - 2)) {
                                 Google.postToSingle(btcValue);
