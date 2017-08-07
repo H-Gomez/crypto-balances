@@ -22,7 +22,8 @@ function Bitfinex() {
  */
 Bitfinex.prototype.getWallets = function(callback) {
     let url = 'v2/auth/r/wallets';
-    let nonce = Date.now().toString();
+    let nonce = (new Date()).getTime() * 1000;
+    //let nonce = Date.now().toString();
     let signature = `/api/${url}${nonce}${rawBody}`;
     let signedMessage = sign.signMessage(signature, this.hmac, this.apiSecret);
     let options = {
@@ -35,11 +36,17 @@ Bitfinex.prototype.getWallets = function(callback) {
         json: body
     };
 
+    console.log(options.headers);
     request.post(options, function (error, response, body) {
         let balances = { BTC: 0, ETH: 0, ETC: 0, LTC: 0, USD: 0 };
 
         if (error) {
             console.log("There was an error with Bitfinex API: " + error);
+            return;
+        }
+
+        if (body[0] === "error") {
+            console.log("There was an error with the API Key for Bitfinex.");
             return;
         }
 

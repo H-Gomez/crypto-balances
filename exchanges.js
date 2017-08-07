@@ -34,9 +34,7 @@ let runSheetUpdater = cron.job('1 * * * * *', function() {
                     if (item['Currency'] !== 'USDT' || item['Currency'] !== 'BTC') {
                         Bittrex.getTicker(item['Currency'], function(response) {
                             btcValue += item['Balance'] * response;
-                            //console.log('result for ticker: ' + item['Currency'] + ' BTC Value ' + btcValue);
                             itemsProcessed++;
-
                             if (itemsProcessed === (tickers.length - 2)) {
                                 Google.postToSingle(btcValue);
                             }
